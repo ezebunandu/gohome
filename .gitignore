@@ -1,3 +1,5 @@
 cyw43439/
 
 *.uf2
+tempmonitor/.DS_Store
+.DS_Store
