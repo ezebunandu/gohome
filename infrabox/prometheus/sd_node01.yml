@@ -1,0 +1,5 @@
+---
+- labels:
+    job: node01
+  targets:
+  - 'rpi-host:9100'

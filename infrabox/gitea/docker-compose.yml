@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  gitea:
+    image: docker.io/gitea/gitea:1.20.1
+    restart: always
+    volumes:
+      - "git_data:/data"
+
+    ports:
+      - 3000:3000
+      - 2222:22
+    environment:
+      DB_USER: gitea
+      DB_NAME: gitea
+      DB_TYPE: postgres
+      DB_HOST: db:5432
+
+  db:
+    image: docker.io/postgres:15.3-alpine
+    restart: always
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+    expose:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: gitea
+      POSTGRES_USER: gitea
+      POSTGRES_DB: gitea
+
+volumes:
+  git_data: {}
+  db_data: {}
