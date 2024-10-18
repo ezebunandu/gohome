@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"structs"
 	"time"
 
 	"github.com/stianeikeland/go-rpio/v4"
