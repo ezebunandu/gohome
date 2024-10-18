@@ -147,8 +147,12 @@ func doorStateHandler(pin rpio.Pin) http.HandlerFunc {
 func newMux(pin rpio.Pin) http.Handler {
     mux := http.NewServeMux()
 
-    mux.HandleFunc("GET /", func(w http.ResponseWriter, _ *http.Request) {
-        fmt.Fprintln(w, "Door status API running...")
+    mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        if r.Method == http.MethodGet {
+            fmt.Fprintln(w, "Door status API running...")
+        } else {
+            http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+        }
     })
     mux.Handle("/getdoor", doorStateHandler(pin))
     return mux
