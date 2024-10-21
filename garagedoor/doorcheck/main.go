@@ -111,10 +111,15 @@ func checkDoor(pin rpio.Pin, cfg *config, discordWebhookURL string) {
         doorState := getDoorState(pin)
         log.Println("Door state:", doorState)
 
+        l, err := time.LoadLocation("America/Edmonton")
+        if err != nil {
+            log.Println("Error converting location:", err)
+        }
+
         if doorState == state(rpio.Low) {
             if isNight(cfg.NightStart.t, cfg.NightEnd.t) {
                 message := fmt.Sprint(
-                    "Door open at night:", time.Now(),
+                    "Door open at night:", time.Now().In(l),
                 )
                 log.Println(message)
                 go sendNotification(
