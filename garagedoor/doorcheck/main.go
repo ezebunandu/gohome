@@ -97,6 +97,8 @@ func sendNotification(discordWebhook, message string) {
     if err != nil {
         log.Println("Error sending Discord request:", err)
         return
+    } else {
+        log.Println("Sent request to discord")
     }
 
     defer response.Body.Close()
@@ -131,8 +133,11 @@ func checkDoor(pin rpio.Pin, cfg *config, discordWebhookURL string) {
                 m := fmt.Sprint("Door is open at regular hour", time.Now().In(l))
                 log.Println(m)
             }
+        } else if doorState == state(rpio.High) {
+            m := fmt.Sprint("Door is closed, no need to notification to discord")
+            log.Println(m)
         }
-        log.Println("Will make next request in a minute.")
+        log.Println("Will check and log door state again in a minute.")
     }
 }
 
