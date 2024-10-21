@@ -103,6 +103,8 @@ func sendNotification(discordWebhook, message string) {
 
     if response.StatusCode != http.StatusOK {
         log.Printf("invalid response from Discord channel: %s", response.Status)
+    } else {
+        log.Printf("Received a valid response from the Discord channel: %s", response.Status)
     }
 }
 
@@ -125,8 +127,12 @@ func checkDoor(pin rpio.Pin, cfg *config, discordWebhookURL string) {
                 go sendNotification(
                     discordWebhookURL, message,
                 )
+            } else {
+                m := fmt.Sprint("Door is open at regular hour", time.Now().In(l))
+                log.Println(m)
             }
         }
+        log.Println("Will make next request in a minute.")
     }
 }
 
