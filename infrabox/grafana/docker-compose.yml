@@ -1,0 +1,13 @@
+services:
+  grafana:
+    image: docker.io/grafana/grafana-oss:9.5.6
+    container_name: grafana01 
+    restart: always
+    networks:
+      - prometheus_prom_net
+    ports:
+      - "3100:3000"
+
+networks:
+  prometheus_prom_net:
+    external: true  # Indicates that this network is defined outside this compose file
