@@ -1,6 +1,6 @@
 services:
   grafana:
-    image: docker.io/grafana/grafana-oss:9.5.6
+    image: docker.io/grafana/grafana-oss
     container_name: grafana01 
     restart: always
     networks:
