@@ -1,0 +1,17 @@
+services:
+  picotempexport:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: picotempexport:v1
+    ports:
+      - "3030:3030"
+    environment:
+      - PICO_SERVER_URL=http://192.168.57.213
+    restart: always
+    networks:
+      - prometheus_prom_net
+
+networks:
+  prometheus_prom_net:
+    external: true
