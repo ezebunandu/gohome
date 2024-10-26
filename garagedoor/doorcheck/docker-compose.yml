@@ -16,6 +16,6 @@ services:
       - "./config.yml:/etc/config.yml"
       - "/etc/localtime:/etc/localtime:ro"  # Mounts local timezone to sync time
     devices:
-      - "/etc/gpiomem:/etc/gpiomem"
+      - "/dev/gpiomem:/dev/gpiomem"
       - "/dev/mem:/dev/mem"
     command: ["-c", "/etc/config.yml"]
