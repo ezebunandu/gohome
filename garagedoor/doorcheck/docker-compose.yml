@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  doorcheck:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Adjust this if your Dockerfile has a different name
+    image: doorcheck:v1
+    container_name: doorcheck
+    restart: always
+    ports:
+      - "3060:3060"
+    environment:
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+    volumes:
+      - "./config.yml:/etc/config.yml"
+      - "/etc/localtime:/etc/localtime:ro"  # Mounts local timezone to sync time
+    devices:
+      - "/etc/gpiomem:/etc/gpiomem"
+      - "/dev/mem:/dev/mem"
+    command: ["-c", "/etc/config.yml"]
