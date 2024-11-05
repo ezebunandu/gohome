@@ -32,3 +32,18 @@ scrape_configs:
       - '/prometheus/sd_*.yml'
       - '/prometheus/sd_*.yaml'
       refresh_interval: "30s"
+  - job_name: pve_exporter
+    metrics_path: "/pve"
+    params:
+      module: [default]
+    file_sd_configs:
+      - files:
+          - "/prometheus/sd_pve_exporter.yml"
+        refresh_interval: "30s"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 192.168.57.71:9221
