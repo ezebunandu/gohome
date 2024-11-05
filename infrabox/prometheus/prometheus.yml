@@ -36,13 +36,9 @@ scrape_configs:
     static_configs:
       - targets:
           - 192.168.227.2 # Proxmox VE node.
-    metrics_path: "/pve"
+    metrics_path: /pve
     params:
       module: [default]
-    file_sd_configs:
-      - files:
-          - "/prometheus/sd_pve_exporter.yml"
-        refresh_interval: "30s"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
