@@ -36,6 +36,8 @@ scrape_configs:
     static_configs:
       - targets:
           - 192.168.227.2 # Proxmox VE node.
+          - 192.168.227.3
+          - 192.168.227.250
     metrics_path: /pve
     params:
       module: [default]
