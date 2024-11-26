@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: prometheus-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: prometheus
+  ports:
+  - port: 80
+    targetPort: 9090
