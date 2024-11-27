@@ -1,0 +1,20 @@
+---
+unit: "C"
+lang: "EN"
+location: "Calgary, CA"
+hue_id: ""
+hue_ip_address: "192.168.57.231"
+owm_api_key: ""
+light_name: "Office side light"
+
+max_color: red
+
+colors:
+  - color: orange
+    threshold: 25
+  - color: green
+    threshold: 10
+  - color: yellow
+    threshold: 10
+  - color: blue
+    threshold: 0
