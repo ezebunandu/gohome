@@ -1,5 +1,6 @@
 services:
   lightweather:
+    container_name: lightweather
     build:
       context: .
       dockerfile: Dockerfile
