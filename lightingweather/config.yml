@@ -13,8 +13,12 @@ colors:
   - color: orange
     threshold: 25
   - color: green
-    threshold: 10
+    threshold: 15
   - color: yellow
-    threshold: 10
-  - color: blue
     threshold: 0
+  - color: blue
+    threshold: -20
+  - color: purple
+    threshold: -10
+  - color: red
+    threshold: 30

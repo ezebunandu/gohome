@@ -27,7 +27,10 @@ func getCurrentTemperature(cfg *config) (int, error) {
         return 0, err
     }
 
-    err = w.CurrentByName(cfg.Location)
+    // make the lat & long configurable
+    err = w.CurrentByCoordinates(&owm.Coordinates{
+        Longitude: -113.94892,
+        Latitude: 50.87488,})
 
     return int(math.Round(w.Main.Temp)), err
 }
@@ -87,7 +90,7 @@ func lightweather(cfg *config, chRefresh <- chan struct{}) {
 func newMux(cfg *config) http.Handler {
     mux := http.NewServeMux()
 
-    mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+    mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
         log.Println("INFO: Received request to root")
         w.Write(rootPageHTML)
     })
@@ -98,7 +101,7 @@ func newMux(cfg *config) http.Handler {
 
     chRefresh <- struct{}{}
 
-    mux.HandleFunc("POST /refresh", func(w http.ResponseWriter, r *http.Request) {
+    mux.HandleFunc("POST /refresh", func(w http.ResponseWriter, _ *http.Request) {
         log.Println("INFO: Received refresh request")
         chRefresh <- struct{}{}
         w.WriteHeader(http.StatusAccepted)
