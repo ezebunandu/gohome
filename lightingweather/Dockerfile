@@ -3,7 +3,7 @@ RUN mkdir /app
 WORKDIR /app
 COPY . /app
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o lightweather lightweather.go config.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o lightweather lightingweather.go config.go
 
 FROM docker.io/alpine:latest
 RUN mkdir /app && adduser -h /app -D lightweather
