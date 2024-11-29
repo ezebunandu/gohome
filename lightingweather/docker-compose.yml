@@ -1,0 +1,21 @@
+services:
+  lightweather:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lightweather:v1
+    volumes:
+      - ./config.yml:/etc/config.yml
+    ports:
+      - "3040:3040"
+    environment:
+      - OWM_API_KEY=${OWM_API_KEY}
+      - HUE_ID=${HUE_ID}
+    restart: always
+    networks:
+      - prometheus_prom_net
+    command: ["-c", "/etc/config.yml"]
+
+networks:
+  prometheus_prom_net:
+    external: true
