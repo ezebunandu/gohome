@@ -1,7 +1,8 @@
 ---
 unit: "C"
 lang: "EN"
-location: "Calgary, CA"
+longitude: "-113.94892"
+latitude: "50.87488"
 hue_id: ""
 hue_ip_address: "192.168.57.231"
 owm_api_key: ""
@@ -20,5 +21,3 @@ colors:
     threshold: -20
   - color: purple
     threshold: -10
-  - color: red
-    threshold: 30

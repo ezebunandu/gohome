@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+    "strconv"
     "gopkg.in/yaml.v3"
 
 	hue "github.com/collinux/gohue"
@@ -33,7 +34,10 @@ var colorTranslate = map[string]*[2]float32{
 type config struct {
     Unit string `yaml:"unit"`
     Lang string `yaml:"lang"`
-    Location string `yaml:"location"`
+    LongitudeStr string `yaml:"longitude"`
+    LatitudeStr string `yaml:"latitude"`
+    Longitude float64 `yaml:"-"`
+    Latitude float64 `yaml:"-"`
     HueID string `yaml:"hue_id"`
     HueIPAddress string `yaml:"hue_ip_address"`
     OWMAPIKey string `yaml:"owm_api_key"`
@@ -60,6 +64,16 @@ func newConfig(configFile string) (*config, error) {
 
     if err := yaml.NewDecoder(cf).Decode(&cfg); err != nil {
         return nil, err
+    }
+
+    cfg.Longitude, err = strconv.ParseFloat(cfg.LongitudeStr, 64)
+    if err != nil {
+        return nil, fmt.Errorf("invalid longitude value: %v", err)
+    }
+
+    cfg.Latitude, err = strconv.ParseFloat(cfg.LatitudeStr, 64)
+    if err != nil {
+        return nil, fmt.Errorf("invalid latitude value: %v", err)
     }
 
     for _, cl := range cfg.Colors {

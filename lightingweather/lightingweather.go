@@ -27,10 +27,9 @@ func getCurrentTemperature(cfg *config) (int, error) {
         return 0, err
     }
 
-    // make the lat & long configurable
     err = w.CurrentByCoordinates(&owm.Coordinates{
-        Longitude: -113.94892,
-        Latitude: 50.87488,})
+        Longitude: cfg.Longitude,
+        Latitude: cfg.Latitude})
 
     return int(math.Round(w.Main.Temp)), err
 }
