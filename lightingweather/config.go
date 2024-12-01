@@ -34,10 +34,8 @@ var colorTranslate = map[string]*[2]float32{
 type config struct {
     Unit string `yaml:"unit"`
     Lang string `yaml:"lang"`
-    LongitudeStr string `yaml:"longitude"`
-    LatitudeStr string `yaml:"latitude"`
-    Longitude float64 `yaml:"-"`
-    Latitude float64 `yaml:"-"`
+    Longitude float64 `yaml:"longitude"`
+    Latitude float64 `yaml:"latitude"`
     HueID string `yaml:"hue_id"`
     HueIPAddress string `yaml:"hue_ip_address"`
     OWMAPIKey string `yaml:"owm_api_key"`
@@ -53,6 +51,46 @@ func (cfg *config) sortColorRange() *config {
     return cfg
 }
 
+func (cfg *config) UnmarshalYAML(unmarshal func(interface{}) error) error {
+    var raw struct {
+        LongitudeStr string `yaml:"longitude"`
+        LatitudeStr string `yaml:"latitude"`
+        Unit string `yaml:"unit"`
+        Lang string `yaml:"lang"`
+        HueID string `yaml:"hue_id"`
+        HueIPAddress string `yaml:"hue_ip_address"`
+        OWMAPIKey string `yaml:"owm_api_key"`
+        LightName string `yaml:"light_name"`
+        MaxColor string `yaml:"max_color"`
+        Colors []color `yaml:"colors"`
+    }
+    if err := unmarshal(&raw); err != nil {
+        return err
+    }
+
+    longitude, err := strconv.ParseFloat(raw.LongitudeStr, 64)
+    if err != nil || longitude < -180 || longitude > 180 {
+        return fmt.Errorf("invalid longitude: %v (must be between -180 and 180)", raw.LatitudeStr)
+    }
+
+    latitude, err := strconv.ParseFloat(raw.LatitudeStr, 64)
+    if err != nil  || latitude < -90 || latitude > 90{
+        return fmt.Errorf("invalid latitude: %v (must be between -90 and 90)", raw.LatitudeStr)
+    }
+    cfg.Unit = raw.Unit
+    cfg.Lang = raw.Lang
+    cfg.Longitude = longitude
+    cfg.Latitude = latitude
+    cfg.HueID = raw.HueID
+    cfg.HueIPAddress = raw.HueIPAddress
+    cfg.OWMAPIKey = raw.OWMAPIKey
+    cfg.LightName = raw.LightName
+    cfg.MaxColor = raw.MaxColor
+    cfg.Colors = raw.Colors
+
+    return nil
+}
+
 func newConfig(configFile string) (*config, error) {
     cf, err := os.Open(configFile)
     if err != nil {
@@ -64,16 +102,6 @@ func newConfig(configFile string) (*config, error) {
 
     if err := yaml.NewDecoder(cf).Decode(&cfg); err != nil {
         return nil, err
-    }
-
-    cfg.Longitude, err = strconv.ParseFloat(cfg.LongitudeStr, 64)
-    if err != nil {
-        return nil, fmt.Errorf("invalid longitude value: %v", err)
-    }
-
-    cfg.Latitude, err = strconv.ParseFloat(cfg.LatitudeStr, 64)
-    if err != nil {
-        return nil, fmt.Errorf("invalid latitude value: %v", err)
     }
 
     for _, cl := range cfg.Colors {
