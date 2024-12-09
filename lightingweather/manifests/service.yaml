@@ -9,5 +9,6 @@ spec:
   ports:
     - protocol: TCP
       port: 3040
-      targetPort: 3040
+      targetPort: http
+      name: http
   type: LoadBalancer

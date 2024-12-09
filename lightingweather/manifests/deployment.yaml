@@ -20,6 +20,7 @@ spec:
           image: 192.168.227.11:5000/lightweather:v4
           ports:
             - containerPort: 3040
+              name: http
           env:
             - name: OWM_API_KEY
               valueFrom:

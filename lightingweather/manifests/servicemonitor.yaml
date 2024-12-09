@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: lightweather
+  namespace: monitoring # match the namespace where Prometheus is deployed
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: lightweather  # match the label of the lightweather service
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 1m
+  namespaceSelector:
+    matchNames:
+    - gohome # namespace where the service to be monitored is running
+
