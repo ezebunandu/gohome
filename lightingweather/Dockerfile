@@ -9,5 +9,8 @@ FROM docker.io/alpine:latest
 RUN mkdir /app && adduser -h /app -D lightweather
 WORKDIR /app
 COPY --chown=lightweather --from=builder /app/lightweather .
+
+RUN chmod +x /app/lightweather
+
 EXPOSE 3040
 ENTRYPOINT [ "/app/lightweather" ]

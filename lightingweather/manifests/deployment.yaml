@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lightweather
+  namespace: gohome
   labels:
     app: lightweather
 spec:
@@ -16,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lightweather
-          image: lightweather:v1
+          image: 192.168.227.11:5000/lightweather:v4
           ports:
             - containerPort: 3040
           env:
@@ -34,7 +35,8 @@ spec:
             - name: config-volume
               mountPath: /etc/config.yml
               subPath: config.yml
-          command: ["lightweather", "-c", "/etc/config.yml"]
+          command: ["/app/lightweather"]
+          args: ["-c", "/etc/config.yml"]
       volumes:
         - name: config-volume
           configMap:
