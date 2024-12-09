@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lightweather
+  labels:
+    app: lightweather
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lightweather
+  template:
+    metadata:
+      labels:
+        app: lightweather
+    spec:
+      containers:
+        - name: lightweather
+          image: lightweather:v1
+          ports:
+            - containerPort: 3040
+          env:
+            - name: OWM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: owm-api-key-secret
+                  key: OWM_API_KEY
+            - name: HUE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: hue-id-secret
+                  key: HUE_ID
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config.yml
+              subPath: config.yml
+          command: ["lightweather", "-c", "/etc/config.yml"]
+      volumes:
+        - name: config-volume
+          configMap:
+            name: lightweather-config

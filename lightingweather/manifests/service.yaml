@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lightweather-service
+spec:
+  selector:
+    app: lightweather
+  ports:
+    - protocol: TCP
+      port: 3040
+      targetPort: 3040
+  type: LoadBalancer
