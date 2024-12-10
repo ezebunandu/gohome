@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: lightweather
-  namespace: monitoring # match the namespace where Prometheus is deployed
+  namespace: gohome # match the namespace where Prometheus is deployed
   labels:
     release: prometheus
 spec:
