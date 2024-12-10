@@ -13,7 +13,3 @@ spec:
   - port: http
     path: /metrics
     interval: 1m
-  namespaceSelector:
-    matchNames:
-    - gohome # namespace where the service to be monitored is running
-
