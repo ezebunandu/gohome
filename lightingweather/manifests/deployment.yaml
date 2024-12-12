@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lightweather
-          image: 192.168.227.11:5000/lightweather:v4
+          image: registry.home-k3s.lab/gohome/lightweather:v4
           ports:
             - containerPort: 3040
               name: http
@@ -38,6 +38,8 @@ spec:
               subPath: config.yml
           command: ["/app/lightweather"]
           args: ["-c", "/etc/config.yml"]
+      imagePullSecrets:
+      - name: home-k3s-registry
       volumes:
         - name: config-volume
           configMap:
