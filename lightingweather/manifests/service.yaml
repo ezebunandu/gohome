@@ -13,4 +13,4 @@ spec:
       port: 3040
       targetPort: http
       name: http
-  type: LoadBalancer
+  type: ClusterIP
