@@ -1,14 +1,20 @@
 # Lighting Weather
 
-This projects is a Go-based microservice for setting the color of a Phillips Hue lightbulb according to the external temperature. The microservice is designed to run as a Docker container and integrates the OpenweatherMap API and a Phillips Hue SDK for setting the color of the light to match the external temperature according to thresholds set in the `config.yml` file.
+This projects is a Go-based microservice for setting the color of a Phillips Hue lightbulb according to the external temperature. The service runs as a container and integrates the OpenweatherMap API and a Phillips Hue SDK to set the color of the light to match the external temperature according to thresholds defined in the `config.yml` file.
 
-## Architecture
+## Application Logic
 
-Upon start-up, the service spins up a http server that listens for requests on `/`, `/refresh` and `/powerHueOff` endpoints. When a `POST` request is made to `/refresh`, the service sends a message to a  Goroutine that queries the openweathermap API for the current temperature and sets the color of the Phillips Hue lightbulb according to the temperature.
+The service runs a http server that listens for requests on `/`, `/refresh` and `/powerHueOff` endpoints. When a `POST` request is made to `/refresh`, the service sends a message to a  Goroutine that queries the openweathermap API for the current temperature and sets the color of the Phillips Hue lightbulb according to the temperature. The service also sends a message to the Goroutine every 30 minutes to essentially call a `refresh`
 
 `POST` requests to the `/powerHueOff` endpoint will similarly push a message through a channel to a Goroutine that turns the lightbulb off.
 
-The service also exposes a `/metrics` endpoint that can be scrapped by Prometheus. My set-up uses this endpoint to integrate the external temperature readings with an existing Prometheus + Grafana monitoring stack
+A `/metrics` endpoint is exposed that can be scraped by Prometheus to collect `external_weather_temperature` from the service.
+
+## Infrastructure
+
+The microservice application runs as a container wrapped in a Pod/Deployment in a Kubernetes cluster. The pod is exposed within the cluster using a `clusterIP` service. An `ingress` object exposes the service outside the cluster using an `nginx` `ingress-controller`. The application integrates with an existing Prometheus/Grafana monitoring stack using a `serviceMonitor` object.
+
+Below is a screenshot of the Grafana dashboard that monitors the external temperature readings from OpenWeatherMap.
 
 ![alt text](image.png)
 
