@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: lightweather
-          image: registry.home-k3s.lab/gohome/lightweather:v4
+          image: registry.home-k3s.lab/gohome/lightweather:v5
           ports:
             - containerPort: 3040
               name: http
