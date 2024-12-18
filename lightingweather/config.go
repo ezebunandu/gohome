@@ -9,7 +9,7 @@ import (
     "strconv"
     "gopkg.in/yaml.v3"
 
-	hue "github.com/collinux/gohue"
+	hue "github.com/ezebunandu/gohue"
 )
 
 var errInvalidColor = errors.New("invalid color")

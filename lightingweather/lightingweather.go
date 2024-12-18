@@ -14,7 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	owm "github.com/briandowns/openweathermap"
-	hue "github.com/collinux/gohue"
+	hue "github.com/ezebunandu/gohue"
 )
 
 //go:embed rootPage.html

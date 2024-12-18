@@ -1,10 +1,11 @@
 module lightweather
 
-go 1.23.3
+go 1.23.4
 
 require (
 	github.com/briandowns/openweathermap v0.21.0
 	github.com/collinux/gohue v0.0.0-20191209235909-5684411cfded
+	github.com/ezebunandu/gohue v0.0.0-20241218232339-bfcfdb4374ef
 	github.com/prometheus/client_golang v1.20.5
 	gopkg.in/yaml.v3 v3.0.1
 )

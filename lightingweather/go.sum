@@ -7,6 +7,8 @@ github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/collinux/gohue v0.0.0-20191209235909-5684411cfded h1:ws4t/55usHnObyEooaVJ/2GvS2ZqVIFTkAuhWkGT02A=
 github.com/collinux/gohue v0.0.0-20191209235909-5684411cfded/go.mod h1:vkTmxBH+6tK0HuUMZNCHiNFsiKc5v7Wnzmh+aoWjZcU=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
+github.com/ezebunandu/gohue v0.0.0-20241218232339-bfcfdb4374ef h1:qpDH4HBouorMLOanH7/bik+2GHkYBmPGNNaPrAs6GvE=
+github.com/ezebunandu/gohue v0.0.0-20241218232339-bfcfdb4374ef/go.mod h1:z6AXu5j9/VQltos8T32BPl2C5dHWdgk4bBOEVFLqX+A=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/klauspost/compress v1.17.9 h1:6KIumPrER1LHsvBVuDa0r5xaG0Es51mhhB9BQB2qeMA=
