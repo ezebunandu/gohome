@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: picotempexport-service
+  namespace: gohome
+  labels:
+    app: picotempexport
+spec:
+  selector:
+    app: picotempexport
+  ports:
+    - protocol: TCP
+      port: 3030
+      targetPort: temp-export
+      name: temp-export
+  type: ClusterIP
