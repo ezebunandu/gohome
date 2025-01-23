@@ -4,8 +4,9 @@ WORKDIR /app
 COPY . /app
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -ldflags="-s -w" -o doorcheck .
 
-FROM docker.io/alpine:latest
-RUN mkdir /app && adduser -h /app -D doorcheck
+
+FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
-COPY --chown=doorcheck --from=builder /app/doorcheck .
-ENTRYPOINT [ "/app/doorcheck" ]
+USER nonroot:nonroot
+COPY --chown=nonroot:nonroot --from=builder /app/doorcheck .
+ENTRYPOINT ["/app/doorcheck"]
