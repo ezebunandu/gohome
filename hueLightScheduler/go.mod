@@ -1,0 +1,10 @@
+module lightscheduler
+
+go 1.23.6
+
+require (
+	github.com/ezebunandu/gohue v0.0.0-20241219053637-5238c4a2e098
+	gopkg.in/yaml.v3 v3.0.1
+)
+
+require github.com/collinux/gohue v0.0.0-20191209235909-5684411cfded // indirect
