@@ -17,7 +17,7 @@ func turnOffLight(cfg *config, chPowerOff <-chan struct{}) {
 	for {
 		select {
 		case <-ticker.C:
-			if isNight(nightStart, nightEnd) {
+			if isNight(cfg.NightStart.t, cfg.NightEnd.t) {
 				log.Println("INFO: Turning off light")
 				bridge, err := hue.NewBridge(cfg.HueIPAddress)
 				if err != nil {
@@ -66,7 +66,7 @@ func turnOnLight(cfg *config, chPowerOn <-chan struct{}) {
 	for {
 		select {
 		case <-ticker.C:
-			if !isNight(nightStart, nightEnd) {
+			if !isNight(cfg.NightStart.t, cfg.NightEnd.t) {
 				log.Println("INFO: Turning on light")
 				bridge, err := hue.NewBridge(cfg.HueIPAddress)
 				if err != nil {
@@ -126,8 +126,6 @@ func isNight(start, end time.Time) bool {
 	return now.After(start) && now.Before(end)
 }
 
-var nightStart, _ = time.Parse("3:04pm", "10:00pm")
-var nightEnd, _ = time.Parse("3:04pm", "5:30am")
 
 func newMux(cfg *config) http.Handler {
 	mux := http.NewServeMux()
