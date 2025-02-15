@@ -1,0 +1,15 @@
+services:
+  lightscheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    image: lightscheduler:v2
+    container_name: lightscheduler
+    restart: always
+    ports:
+      - "8100:8100"
+    environment:
+      - HUE_ID=${HUE_ID}
+    volumes:
+      - "./config.yml:/etc/config.yml"
+    command: ["-c", "/etc/config.yml"]
