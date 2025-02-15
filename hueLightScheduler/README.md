@@ -4,9 +4,9 @@ This project is a Go-based microservice for turning Phillips Hue lights on and o
 
 ## To-Dos
 
-- Configure the timezone within the container
+- Configure the timezone within the container [DONE]
 
-- Make the night start and end times configurable via the config.yml file
+- Make the night start and end times configurable via the config yml file [DONE]
 
 - Make the lights that are powered on/off a list rather than a single light name
 
