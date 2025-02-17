@@ -1,6 +1,11 @@
 ---
 hue_id: ""
 hue_ip_address: "192.168.57.231"
-light_name: "Lamp Stand 2"
+light_name: 
 night_start: "10:00pm"
 night_end: "5:30am"
+
+lights:
+  - name: "Lamp Stand 2"
+  - name: "Lamp Stand 1"
+  - name: "TV Strip Light"

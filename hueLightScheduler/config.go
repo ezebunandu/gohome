@@ -19,7 +19,7 @@ type yamlHour struct {
 type config struct {
 	HueIPAddress string `yaml:"hue_ip_address"`
 	HueID        string `yaml:"hue_id"`
-	LightName    string `yaml:"light_name"`
+	Lights []light `yaml:"lights"`
 	NightStart yamlHour `yaml:"night_start"`
 	NightEnd yamlHour `yaml:"night_end"`
 }

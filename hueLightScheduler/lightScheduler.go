@@ -28,16 +28,19 @@ func turnOffLight(cfg *config, chPowerOff <-chan struct{}) {
 					log.Println("ERROR:", err)
 					continue
 				}
-				weatherLight, err := bridge.GetLightByName(cfg.LightName)
-				if err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				if err := weatherLight.Off(); err != nil {
-					log.Println("ERROR:", err)
+				for _, light := range(cfg.Lights) {
+					weatherLight, err := bridge.GetLightByName(light.Name)
+					if err != nil {
+						log.Println("ERROR:", err)
+					}
+					if err := weatherLight.Off(); err != nil {
+						log.Println("ERROR:", err)
+						continue
+					}
 				}
 			}
 		case <-chPowerOff:
+			log.Println("INFO: Turning off light")
 			bridge, err := hue.NewBridge(cfg.HueIPAddress)
 			if err != nil {
 				log.Println("ERROR:", err)
@@ -47,13 +50,15 @@ func turnOffLight(cfg *config, chPowerOff <-chan struct{}) {
 				log.Println("ERROR:", err)
 				continue
 			}
-			weatherLight, err := bridge.GetLightByName(cfg.LightName)
-			if err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			if err := weatherLight.Off(); err != nil {
-				log.Println("ERROR:", err)
+			for _, light := range(cfg.Lights) {
+				weatherLight, err := bridge.GetLightByName(light.Name)
+				if err != nil {
+					log.Println("ERROR:", err)
+				}
+				if err := weatherLight.Off(); err != nil {
+					log.Println("ERROR:", err)
+					continue
+				}
 			}
 		}
 	}
@@ -77,15 +82,16 @@ func turnOnLight(cfg *config, chPowerOn <-chan struct{}) {
 					log.Println("ERROR:", err)
 					continue
 				}
-				weatherLight, err := bridge.GetLightByName(cfg.LightName)
-				if err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				if err := weatherLight.On(); err != nil {
-					log.Println("ERROR:", err)
-				}
-			}
+				for _, light := range(cfg.Lights) {
+					weatherLight, err := bridge.GetLightByName(light.Name)
+					if err != nil {
+						log.Println("ERROR:", err)
+					}
+					if err := weatherLight.On(); err != nil {
+						log.Println("ERROR:", err)
+						continue
+					}
+				}			}
 		case <-chPowerOn:
 			bridge, err := hue.NewBridge(cfg.HueIPAddress)
 			if err != nil {
