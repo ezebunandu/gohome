@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,153 +11,163 @@ import (
 	hue "github.com/ezebunandu/gohue"
 )
 
-func turnOffLight(cfg *config, chPowerOff <-chan struct{}) {
-	ticker := time.NewTicker(5 * time.Minute)
-	defer ticker.Stop()
+type lightManager struct {
+	cfg       *config
+	isOn      bool
+	bridge    *hue.Bridge
+	lights    map[string]*hue.Light // Map of light names to light objects
+	powerChan chan bool             // true for on, false for off
+}
 
-	for {
-		select {
-		case <-ticker.C:
-			if isNight(cfg.NightStart.t, cfg.NightEnd.t) {
-				log.Println("INFO: Turning off light")
-				bridge, err := hue.NewBridge(cfg.HueIPAddress)
-				if err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				if err := bridge.Login(cfg.HueID); err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				for _, light := range(cfg.Lights) {
-					weatherLight, err := bridge.GetLightByName(light.Name)
-					if err != nil {
-						log.Println("ERROR:", err)
-					}
-					if err := weatherLight.Off(); err != nil {
-						log.Println("ERROR:", err)
-						continue
-					}
-				}
-			}
-		case <-chPowerOff:
-			log.Println("INFO: Turning off light")
-			bridge, err := hue.NewBridge(cfg.HueIPAddress)
-			if err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			if err := bridge.Login(cfg.HueID); err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			for _, light := range(cfg.Lights) {
-				weatherLight, err := bridge.GetLightByName(light.Name)
-				if err != nil {
-					log.Println("ERROR:", err)
-				}
-				if err := weatherLight.Off(); err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-			}
+func newLightManager(cfg *config) (*lightManager, error) {
+	bridge, err := hue.NewBridge(cfg.HueIPAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create bridge: %w", err)
+	}
+
+	if err := bridge.Login(cfg.HueID); err != nil {
+		return nil, fmt.Errorf("failed to login to bridge: %w", err)
+	}
+
+	// Initialize lights map
+	lights := make(map[string]*hue.Light)
+	for _, lightConfig := range cfg.Lights {
+		light, err := bridge.GetLightByName(lightConfig.Name)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get light %s: %w", lightConfig.Name, err)
 		}
+		lights[lightConfig.Name] = &light
+	}
+
+	return &lightManager{
+		cfg:       cfg,
+		bridge:    bridge,
+		lights:    lights,
+		powerChan: make(chan bool, 2),
+	}, nil
+}
+
+func (lm *lightManager) setState(on bool) {
+	if lm.isOn == on {
+		return // Already in desired state
+	}
+
+	for name, light := range lm.lights {
+		var err error
+		if on {
+			err = light.On()
+			log.Printf("INFO: Turning light %s on", name)
+		} else {
+			err = light.Off()
+			log.Printf("INFO: Turning light %s off", name)
+		}
+
+		if err != nil {
+			log.Printf("ERROR: Failed to set light %s state to %v: %v", name, on, err)
+			continue
+		}
+	}
+
+	lm.isOn = on
+}
+
+func (lm *lightManager) scheduleStateChanges() {
+	for {
+		now := time.Now()
+		nextChange := lm.calculateNextChangeTime(now)
+		wait := nextChange.Sub(now)
+
+		log.Printf("INFO: Next state change scheduled for %v (waiting %v)", nextChange.Format("15:04"), wait)
+
+		time.Sleep(wait)
+
+		shouldBeOn := !isNight(lm.cfg.NightStart.t, lm.cfg.NightEnd.t)
+		lm.setState(shouldBeOn)
 	}
 }
 
-func turnOnLight(cfg *config, chPowerOn <-chan struct{}) {
-	ticker := time.NewTicker(5 * time.Minute)
-	defer ticker.Stop()
+func (lm *lightManager) calculateNextChangeTime(now time.Time) time.Time {
+	today := now.Truncate(24 * time.Hour)
 
-	for {
-		select {
-		case <-ticker.C:
-			if !isNight(cfg.NightStart.t, cfg.NightEnd.t) {
-				log.Println("INFO: Turning on light")
-				bridge, err := hue.NewBridge(cfg.HueIPAddress)
-				if err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				if err := bridge.Login(cfg.HueID); err != nil {
-					log.Println("ERROR:", err)
-					continue
-				}
-				for _, light := range(cfg.Lights) {
-					weatherLight, err := bridge.GetLightByName(light.Name)
-					if err != nil {
-						log.Println("ERROR:", err)
-					}
-					if err := weatherLight.On(); err != nil {
-						log.Println("ERROR:", err)
-						continue
-					}
-				}			}
-		case <-chPowerOn:
-			bridge, err := hue.NewBridge(cfg.HueIPAddress)
-			if err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			if err := bridge.Login(cfg.HueID); err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			weatherLight, err := bridge.GetLightByName(cfg.LightName)
-			if err != nil {
-				log.Println("ERROR:", err)
-				continue
-			}
-			if err := weatherLight.On(); err != nil {
-				log.Println("ERROR:", err)
-			}
-		}
+	start := time.Date(today.Year(), today.Month(), today.Day(),
+		lm.cfg.NightStart.t.Hour(), lm.cfg.NightStart.t.Minute(), 0, 0, today.Location())
+	end := time.Date(today.Year(), today.Month(), today.Day(),
+		lm.cfg.NightEnd.t.Hour(), lm.cfg.NightEnd.t.Minute(), 0, 0, today.Location())
+
+	if end.Before(start) {
+		end = end.Add(24 * time.Hour)
+	}
+
+	if now.Before(start) {
+		return start
+	} else if now.Before(end) {
+		return end
+	} else {
+		// Next day's start time
+		return start.Add(24 * time.Hour)
 	}
 }
 
 func isNight(start, end time.Time) bool {
-	cur := time.Now().Format("15:04")
+	now := time.Now()
 
-	now, err := time.Parse("15:04", cur)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
+	// Create today's date with the start and end times
+	todayStart := time.Date(now.Year(), now.Month(), now.Day(), start.Hour(), start.Minute(), 0, 0, now.Location())
+	todayEnd := time.Date(now.Year(), now.Month(), now.Day(), end.Hour(), end.Minute(), 0, 0, now.Location())
+
+	// Handle overnight periods (when end time is before start time)
 	if end.Before(start) {
-		end = end.Add(24 * time.Hour)
-	}
-	if now.Before(start) {
-		now = now.Add(24 * time.Hour)
+		if now.After(todayStart) {
+			// We're after start time today, so end time should be tomorrow
+			todayEnd = todayEnd.Add(24 * time.Hour)
+		} else {
+			// We're before end time today, so start time should be from yesterday
+			todayStart = todayStart.Add(-24 * time.Hour)
+		}
 	}
 
-	return now.After(start) && now.Before(end)
+	return now.After(todayStart) && now.Before(todayEnd)
 }
 
+func (lm *lightManager) run() {
+	// Calculate initial state
+	shouldBeOn := !isNight(lm.cfg.NightStart.t, lm.cfg.NightEnd.t)
+	lm.setState(shouldBeOn)
 
-func newMux(cfg *config) http.Handler {
+	// Start scheduling goroutine
+	go lm.scheduleStateChanges()
+
+	// Handle manual override requests
+	for newState := range lm.powerChan {
+		lm.setState(newState)
+	}
+}
+
+func newMux(cfg *config) (http.Handler, error) {
 	mux := http.NewServeMux()
 
-	chPowerOff := make(chan struct{}, 2)
-	chPowerOn := make(chan struct{}, 2)
+	lm, err := newLightManager(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create light manager: %w", err)
+	}
 
-	go turnOffLight(cfg, chPowerOff)
-	go turnOnLight(cfg, chPowerOn)
+	go lm.run()
 
 	mux.HandleFunc("/turnOn", func(w http.ResponseWriter, _ *http.Request) {
 		log.Println("INFO: Received request to turn on light")
-		chPowerOn <- struct{}{}
+		lm.powerChan <- true
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("Turn on request accepted"))
 	})
 
 	mux.HandleFunc("/turnOff", func(w http.ResponseWriter, _ *http.Request) {
 		log.Println("INFO: Received request to turn off light")
-		chPowerOff <- struct{}{}
+		lm.powerChan <- false
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("Turn off request accepted"))
 	})
 
-	return mux
+	return mux, nil
 }
 
 func main() {
@@ -164,7 +175,12 @@ func main() {
 	flag.Parse()
 
 	cfg, err := newConfig(*c)
+	if err != nil {
+		log.Println("ERROR:", err)
+		os.Exit(1)
+	}
 
+	handler, err := newMux(cfg)
 	if err != nil {
 		log.Println("ERROR:", err)
 		os.Exit(1)
@@ -172,7 +188,7 @@ func main() {
 
 	s := &http.Server{
 		Addr:         ":8100",
-		Handler:      newMux(cfg),
+		Handler:      handler,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
