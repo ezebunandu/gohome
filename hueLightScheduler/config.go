@@ -29,7 +29,7 @@ func (yh *yamlHour) UnmarshalYAML(v *yaml.Node) error {
 		return errors.New("not a scaler value")
 	}
 	var err error
-	yh.t, err = time.Parse("4:04pm", v.Value)
+	yh.t, err = time.Parse("3:04pm", v.Value)
 	return err
 }
 
@@ -52,7 +52,7 @@ func newConfig(configFile string) (*config, error) {
 
 	if cfg.NightStart.t.IsZero(){
 		var err error
-		cfg.NightStart.t, err = time.Parse("4:04pm", "10:00pm") // night starts 10pm, if not defined in config file
+		cfg.NightStart.t, err = time.Parse("3:04pm", "10:00pm") // night starts 10pm, if not defined in config file
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +60,7 @@ func newConfig(configFile string) (*config, error) {
 
 	if cfg.NightEnd.t.IsZero() {
 		var err error
-		cfg.NightEnd.t, err = time.Parse("4:04pm", "5:30am") // night ends at 5:30am, if not defined in config
+		cfg.NightEnd.t, err = time.Parse("3:04pm", "5:30am") // night ends at 5:30am, if not defined in config
 		if err != nil {
 			return nil, err
 		}

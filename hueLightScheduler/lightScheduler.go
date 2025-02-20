@@ -48,22 +48,16 @@ func newLightManager(cfg *config) (*lightManager, error) {
 }
 
 func (lm *lightManager) setState(on bool) {
-	if lm.isOn == on {
-		return // Already in desired state
-	}
-
 	for name, light := range lm.lights {
 		var err error
 		if on {
 			err = light.On()
-			log.Printf("INFO: Turning light %s on", name)
 		} else {
 			err = light.Off()
-			log.Printf("INFO: Turning light %s off", name)
 		}
 
 		if err != nil {
-			log.Printf("ERROR: Failed to set light %s state to %v: %v", name, on, err)
+			log.Printf("Failed to set light %s state to %v: %v", name, on, err)
 			continue
 		}
 	}
@@ -77,7 +71,7 @@ func (lm *lightManager) scheduleStateChanges() {
 		nextChange := lm.calculateNextChangeTime(now)
 		wait := nextChange.Sub(now)
 
-		log.Printf("INFO: Next state change scheduled for %v (waiting %v)", nextChange.Format("15:04"), wait)
+		log.Printf("Next state change scheduled for %v", nextChange.Format("15:04"))
 
 		time.Sleep(wait)
 
@@ -130,6 +124,10 @@ func isNight(start, end time.Time) bool {
 }
 
 func (lm *lightManager) run() {
+	// First turn all lights off to ensure known state
+	lm.setState(false)
+	lm.isOn = false
+
 	// Calculate initial state
 	shouldBeOn := !isNight(lm.cfg.NightStart.t, lm.cfg.NightEnd.t)
 	lm.setState(shouldBeOn)
