@@ -23,7 +23,7 @@ echo "Copying config.yml to manifests/base..."
 cp config.yml manifests/base/
 
 # Create base64 encoded HUE_ID
-HUE_ID_BASE64=$(echo -n "${HUE_ID}" | base64)
+export HUE_ID_BASE64=$(echo -n "${HUE_ID}" | base64 -w 0)
 
 # Read the config file
 CONFIG_CONTENT=$(cat manifests/base/config.yml)
@@ -31,7 +31,7 @@ CONFIG_CONTENT=$(cat manifests/base/config.yml)
 # Apply both secret and configmap together
 echo "Applying secret and configmap..."
 (
-    sed "s/\${HUE_ID_BASE64}/${HUE_ID_BASE64}/" manifests/secrets.yaml
+    envsubst < manifests/secrets.yaml
     echo "---"
     sed "s|\${CONFIG_CONTENT}|${CONFIG_CONTENT}|" manifests/configmap.yaml
 ) | kubectl apply -f -
