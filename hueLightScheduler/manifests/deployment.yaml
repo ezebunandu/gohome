@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: lightscheduler
+    namespace: gohome
+    labels:
+        app: lightscheduler
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: lightscheduler
+    template:
+        metadata:
+            labels:
+                app: lightscheduler
+        spec:
+            containers:
+                - name: lightscheduler
+                  image: registry.home-k3s.lab/gohome/lightscheduler:v2
+                  ports:
+                      - containerPort: 8100
+                        name: http
+                  env:
+                      - name: HUE_ID
+                        valueFrom:
+                            secretKeyRef:
+                                name: hue-id-secret
+                                key: HUE_ID
+                  volumeMounts:
+                      - name: config-volume
+                        mountPath: /etc/config.yml
+                        subPath: config.yml
+                  command: ["/app/lightscheduler"]
+                  args: ["-c", "/etc/config.yml"]
+            imagePullSecrets:
+                - name: home-k3s-registry
+            volumes:
+                - name: config-volume
+                  configMap:
+                      name: lightscheduler-config

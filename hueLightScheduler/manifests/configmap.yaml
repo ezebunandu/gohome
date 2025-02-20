@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: lightscheduler-config
+    namespace: gohome
+data:
+    config.yml: |-
+        $( cat ../config.yml )
