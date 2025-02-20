@@ -6,7 +6,7 @@ namespace: gohome
 configMapGenerator:
     - name: lightscheduler-config
       files:
-          - base/config.yml
+          - config.yml=base/config.yml
 
 resources:
     - deployment.yaml
