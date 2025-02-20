@@ -4,5 +4,4 @@ metadata:
     name: lightscheduler-config
     namespace: gohome
 data:
-    config.yml: |-
-        $( cat ../config.yml )
+    config.yml: ${CONFIG_CONTENT}
