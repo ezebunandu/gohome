@@ -23,11 +23,11 @@ echo "Copying config.yml to manifests/base..."
 cp config.yml manifests/base/
 
 # Create base64 encoded HUE_ID
-export HUE_ID_BASE64=$(echo -n "${HUE_ID}" | base64 -w 0)
+export HUE_ID_BASE64=$(echo -n $HUE_ID | base64)
 
 # Apply secret and other manifests
 echo "Applying secret and manifests..."
-envsubst < manifests/secrets.yaml | kubectl apply -f -
+sed -i -e "s#{HUE_ID}#${HUE_ID_BASE64}#g" manifests/secrets.yaml
 
 # Apply Kubernetes manifests using kustomize
 echo "Applying Kubernetes manifests..."
