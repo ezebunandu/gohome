@@ -1,0 +1,6 @@
+hue_ip_address: "192.168.1.2" # Replace with your Hue Bridge IP
+hue_id: "your-hue-bridge-id" # Replace with your Hue Bridge ID
+lights:
+    - name: "Living Room"
+    - name: "Kitchen"
+    - name: "Bedroom"
