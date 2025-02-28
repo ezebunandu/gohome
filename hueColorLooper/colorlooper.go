@@ -1,10 +1,11 @@
 package main
 
 import (
-	"io"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -34,14 +35,32 @@ import (
 // parse for a config file and initializes a struct from the file contents
 // listen on port 8888
 
+type Lights struct {
+	Lights []string `json:"lights"`
+}
+
+func colorlooper(cfg *config, chStartColorLoop <- chan struct{}, lights []string){
+}
+
 func newMux() http.Handler {
 	mux := http.NewServeMux()
 
+	var l Lights
+
 	mux.HandleFunc("POST /colorlooper", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received post request")
-		w.WriteHeader(http.StatusAccepted)
-		body, _ := io.ReadAll(r.Body)
-		log.Printf("Received request with payload: %q", string(body))
+		dec := json.NewDecoder(r.Body)
+		dec.DisallowUnknownFields()
+		err := dec.Decode(&l)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if len(l.Lights) == 0 {
+			http.Error(w, "missing or empty 'lights' field in request", http.StatusBadRequest)
+			return
+		}
+		log.Printf("Received request with payload: %+v", l.Lights)
 		w.Write([]byte("Received post request to colorlooper"))
 	})
 	return mux
