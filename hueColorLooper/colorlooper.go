@@ -1,72 +1,72 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
+
+	hue "github.com/ezebunandu/gohue"
 )
 
-// webserver listening at a given port
-// when it receives a post request with data containing a list of light names
-// it searches for the names in a config field
-// if it finds at list one matching name, it puts that light into a colorloop
-// and responds with the name of the light put into colorloop and a response message
-// if it doesn't find at least one matching light, it responds with an error message for the
-// list of light names passed with the request
+var HueID = os.Getenv("HUE_ID")
+var HueIPAddress = os.Getenv("HUE_IP_ADDRESS")
 
-// takes a config struct and a channel
-// when a message is received on the channel
-// along with a list of light names
-// set each light in the list to colorloop mode
-// func colorlooper() {}
-
-// request multiplexer than handles a /startloop endpoint
-// when a post request is received, along with a list of light names as data with the request
-// search the list of lights in the config
-// if it finds any that contains the name string
-// save the matching name to a slice of names
-// call the colorlooper function with that slice of name
-// or pass a message to a goroutine in some way that activates the colorlooper
-
-// start a http server in main
-// parse for a config file and initializes a struct from the file contents
-// listen on port 8888
 
 type Lights struct {
 	Lights []string `json:"lights"`
 }
 
-func colorlooper(cfg *config, chStartColorLoop <- chan struct{}, lights []string){
+var lightMappings = map[string]string{
+	"lamp_stand_1": "Lamp Stand 1",
+	"lamp_stand_2": "Lamp Stand 2",
+    "tv_strip_light": "TV Strip Light",
+}
+
+func startColorloop(l string){
+	log.Println("INFO: starting colorloop")
+	bridge, err := hue.NewBridge(HueIPAddress)
+	if err != nil {
+		log.Printf("ERROR: invalid hue ip address: %s\n", HueIPAddress)
+	}
+	if err = bridge.Login(HueID); err != nil {
+		log.Printf("ERROR: invalid hue ip address: %s\n", HueID)
+	}
+	light, err := bridge.GetLightByName(l)
+	if err != nil {
+		log.Printf("could not connect to light: %s", l)
+	}
+	if err = light.ColorLoop(true); err != nil {
+		log.Printf("could not activate colorloop")
+	}
 }
 
 func newMux() http.Handler {
 	mux := http.NewServeMux()
 
-	var l Lights
-
-	mux.HandleFunc("POST /colorlooper", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("PATCH /colorlooper/{light_name}", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received post request")
-		dec := json.NewDecoder(r.Body)
-		dec.DisallowUnknownFields()
-		err := dec.Decode(&l)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		light := r.PathValue("light_name")
+
+		l, ok := lightMappings[light]
+		if !ok {
+			w.Write([]byte(fmt.Sprintf("%s is not a valid light name", light)))
+			log.Printf("ERROR: invalid light name: %s", light)
 			return
+		} else {
+			w.Write([]byte(fmt.Sprintf("Received request to enable colorlooper for %s\n", light)))
+			startColorloop(l)
 		}
-		if len(l.Lights) == 0 {
-			http.Error(w, "missing or empty 'lights' field in request", http.StatusBadRequest)
-			return
-		}
-		log.Printf("Received request with payload: %+v", l.Lights)
-		w.Write([]byte("Received post request to colorlooper"))
 	})
 	return mux
 }
 
 func main() {
+	if HueID == "" || HueIPAddress == ""{
+		log.Fatal("must supply hue details")
+		os.Exit(1)
+	}
 	s := &http.Server{
 		Addr:         ":3040",
 		Handler:      newMux(),
