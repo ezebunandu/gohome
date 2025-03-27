@@ -35,10 +35,10 @@ func startColorloop(l string){
 	}
 	light, err := bridge.GetLightByName(l)
 	if err != nil {
-		log.Printf("could not connect to light: %s", l)
+		log.Printf("ERROR: could not connect to light: %s\n", l)
 	}
 	if err = light.ColorLoop(true); err != nil {
-		log.Printf("could not activate colorloop")
+		log.Printf("ERROR: could not activate colorloop\n")
 	}
 }
 
@@ -48,14 +48,17 @@ func newMux() http.Handler {
 	mux.HandleFunc("PATCH /colorlooper/{light_name}", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received post request")
 		light := r.PathValue("light_name")
-
+		w.Header().Set("Content-Type", "application/json")
 		l, ok := lightMappings[light]
 		if !ok {
-			w.Write([]byte(fmt.Sprintf("%s is not a valid light name", light)))
-			log.Printf("ERROR: invalid light name: %s", light)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(fmt.Sprintf("'%s' is not a valid light name\n", light)))
+			log.Printf("ERROR: invalid light name '%s' is invalid\n", light)
 			return
 		} else {
-			w.Write([]byte(fmt.Sprintf("Received request to enable colorlooper for %s\n", light)))
+			w.WriteHeader(http.StatusAccepted)
+			log.Printf("INFO: starting colorloop for %s\n", light)
+			w.Write([]byte(fmt.Sprintf("Received request to enable colorlooper for '%s'\n", light)))
 			startColorloop(l)
 		}
 	})
