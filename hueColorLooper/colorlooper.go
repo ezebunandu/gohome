@@ -10,22 +10,22 @@ import (
 	hue "github.com/ezebunandu/gohue"
 )
 
-var HueID = os.Getenv("HUE_ID")
-var HueIPAddress = os.Getenv("HUE_IP_ADDRESS")
-
+var HueID string
+var HueIPAddress string
 
 type Lights struct {
 	Lights []string `json:"lights"`
 }
 
+// map the url-friendly name for lights to their actual names on the hue bridge
 var lightMappings = map[string]string{
-	"lamp_stand_1": "Lamp Stand 1",
-	"lamp_stand_2": "Lamp Stand 2",
-    "tv_strip_light": "TV Strip Light",
+	"lamp_stand_1":   "Lamp Stand 1",
+	"lamp_stand_2":   "Lamp Stand 2",
+	"tv_strip_light": "TV Strip Light",
 }
 
-func startColorloop(l string){
-	log.Println("INFO: starting colorloop")
+func startColorloop(l string) {
+	log.Printf("INFO: starting colorloop: %s", l)
 	bridge, err := hue.NewBridge(HueIPAddress)
 	if err != nil {
 		log.Printf("ERROR: invalid hue ip address: %s\n", HueIPAddress)
@@ -45,7 +45,7 @@ func startColorloop(l string){
 func newMux() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("PATCH /colorlooper/{light_name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /colorlooper/{light_name}", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received post request")
 		light := r.PathValue("light_name")
 		w.Header().Set("Content-Type", "application/json")
@@ -62,16 +62,37 @@ func newMux() http.Handler {
 			startColorloop(l)
 		}
 	})
+	mux.HandleFunc("POST /colorlooper/all", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Received  request")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("Received request to enable colorlooper for all lights"))
+		log.Println("INFO: starting colorloop for all lights")
+		for _, l := range lightMappings {
+			if l == "TV Strip Light" {
+				continue
+			}
+			startColorloop(l)
+		}
+	})
 	return mux
 }
 
 func main() {
-	if HueID == "" || HueIPAddress == ""{
-		log.Fatal("must supply hue details")
-		os.Exit(1)
+	var ok bool
+	HueID, ok = os.LookupEnv("HUE_ID")
+	if !ok {
+		log.Println("HUE_ID not set")
+	}
+	HueIPAddress, ok = os.LookupEnv("HUE_IP_ADDRESS")
+	if !ok {
+		log.Println("HUE_IP_ADDRESS not set")
+	}
+	if HueID == "" || HueIPAddress == "" {
+		log.Fatal("HUE_ID and HUE_IP_ADDRESS environment variables must be set")
 	}
 	s := &http.Server{
-		Addr:         ":3040",
+		Addr:         ":3005",
 		Handler:      newMux(),
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
