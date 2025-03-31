@@ -25,12 +25,12 @@ spec:
                       - name: HUE_ID
                         valueFrom:
                             secretKeyRef:
-                                name: hue-secrets
+                                name: hue-color-looper-secrets
                                 key: HUE_ID
                       - name: HUE_IP_ADDRESS
                         valueFrom:
                             secretKeyRef:
-                                name: hue-secrets
+                                name: hue-color-looper-secrets
                                 key: HUE_IP_ADDRESS
             imagePullSecrets:
                 - name: home-k3s-registry
