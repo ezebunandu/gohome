@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: colorlooper-service
+    namespace: gohome
+    labels:
+        app: colorlooper
+spec:
+    selector:
+        app: colorlooper
+    ports:
+        - protocol: TCP
+          port: 3005
+          targetPort: http
+          name: http
+    type: ClusterIP

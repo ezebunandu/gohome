@@ -1,0 +1,13 @@
+services:
+  colorlooper:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    image: colorlooper:v1
+    container_name: colorlooper
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - HUE_ID=${HUE_ID}
+      - HUE_IP_ADDRESS=${HUE_IP_ADDRESS}

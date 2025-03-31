@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: colorlooper
+    namespace: gohome
+    labels:
+        app: colorlooper
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: colorlooper
+    template:
+        metadata:
+            labels:
+                app: colorlooper
+        spec:
+            containers:
+                - name: colorlooper
+                  image: registry.home-k3s.lab/gohome/colorlooper:v1
+                  ports:
+                      - containerPort: 3005
+                        name: http
+                  env:
+                      - name: HUE_ID
+                        valueFrom:
+                            secretKeyRef:
+                                name: hue-secrets
+                                key: HUE_ID
+                      - name: HUE_IP_ADDRESS
+                        valueFrom:
+                            secretKeyRef:
+                                name: hue-secrets
+                                key: HUE_IP_ADDRESS
+            imagePullSecrets:
+                - name: home-k3s-registry
