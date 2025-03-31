@@ -17,7 +17,7 @@ spec:
         spec:
             containers:
                 - name: colorlooper
-                  image: registry.home-k3s.lab/gohome/colorlooper:v1
+                  image: registry.home-k3s.lab/gohome/colorlooper:v2
                   ports:
                       - containerPort: 3005
                         name: http
