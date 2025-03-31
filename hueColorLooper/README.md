@@ -1,6 +1,13 @@
 # Hue Color Looper
 
-This project uses the hue bridge API to set phillips hue lights to the colorloop mode when a post request is received to a microservice endpoint, with a list of light names passed in the body of the request.
+This project uses the hue bridge API to set phillips hue lights to the colorloop mode when a post is received.
 
-The service can be configured with a yaml file to define the actual names of lights to control, as well as details of the hue bridge device and the api token.
+Requests to `/colorloop/{light_name}` will put the specified light into colorloop mode, if `light_name` is a valid name, else, it returns a 400 response.
 
+Requests to `/colorloop/all` will put all the configured lights in colorloop mode, returning a 200 response.
+
+## To-Dos
+
+- make the lights that can be controlled configurable with a yaml config file
+
+- make the service run on a schedule to set all lights to colorloop daily at 5:40 AM.

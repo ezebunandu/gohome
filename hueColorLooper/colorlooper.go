@@ -25,7 +25,7 @@ var lightMappings = map[string]string{
 }
 
 func startColorloop(l string) {
-	log.Printf("INFO: starting colorloop: %s", l)
+	log.Printf("INFO: starting colorloop for : %s", l)
 	bridge, err := hue.NewBridge(HueIPAddress)
 	if err != nil {
 		log.Printf("ERROR: invalid hue ip address: %s\n", HueIPAddress)
@@ -38,14 +38,14 @@ func startColorloop(l string) {
 		log.Printf("ERROR: could not connect to light: %s\n", l)
 	}
 	if err = light.ColorLoop(true); err != nil {
-		log.Printf("ERROR: could not activate colorloop\n")
+		log.Printf("ERROR: could not activate colorloop: %#v\n", err)
 	}
 }
 
 func newMux() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /colorlooper/{light_name}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /colorloop/{light_name}", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received post request")
 		light := r.PathValue("light_name")
 		w.Header().Set("Content-Type", "application/json")
@@ -62,7 +62,7 @@ func newMux() http.Handler {
 			startColorloop(l)
 		}
 	})
-	mux.HandleFunc("POST /colorlooper/all", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /colorloop/all", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Received  request")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusAccepted)

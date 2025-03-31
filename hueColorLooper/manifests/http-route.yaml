@@ -13,7 +13,7 @@ spec:
         - matches:
               - path:
                     type: PathPrefix
-                    value: /colorlooper
+                    value: /colorloop
           backendRefs:
               - name: colorlooper-service
                 port: 3005
