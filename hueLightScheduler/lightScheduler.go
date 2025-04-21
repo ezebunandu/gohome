@@ -169,10 +169,10 @@ func newMux(cfg *config) (http.Handler, error) {
 }
 
 func main() {
-	c := flag.String("c", "config.yml", "Config file")
+	cfgPath := flag.String("c", "config.yml", "Config file")
 	flag.Parse()
 
-	cfg, err := newConfig(*c)
+	cfg, err := newConfig(*cfgPath)
 	if err != nil {
 		log.Println("ERROR:", err)
 		os.Exit(1)
