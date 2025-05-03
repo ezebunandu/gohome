@@ -9,5 +9,3 @@ Requests to `/colorloop/all` will put all the configured lights in colorloop mod
 ## To-Dos
 
 - make the lights that can be controlled configurable with a yaml config file
-
-- make the service run on a schedule to set all lights to colorloop daily at 5:40 AM.

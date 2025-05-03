@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+    name: colorlooper-cronjob
+    namespace: gohome
+spec:
+    schedule: "35 12 * * *" # Runs at 5:35 AM MT daily (12:35 UTC)
+    jobTemplate:
+        spec:
+            template:
+                spec:
+                    containers:
+                        - name: colorlooper-caller
+                          image: alpine:latest
+                          command:
+                              - /bin/sh
+                              - -c
+                              - curl -X POST http://colorlooper-service/colorloop/all
+                    restartPolicy: OnFailure
