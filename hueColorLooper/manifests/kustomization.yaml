@@ -8,3 +8,4 @@ resources:
     - service.yaml
     - http-route.yaml
     - secrets.yaml
+    - cronjob.yaml
