@@ -15,5 +15,5 @@ spec:
                           command:
                               - /bin/sh
                               - -c
-                              - curl -X POST http://colorlooper-service/colorloop/all
+                              - apk add --no-cache curl && curl -X POST http://colorlooper-service/colorloop/all
                     restartPolicy: OnFailure
