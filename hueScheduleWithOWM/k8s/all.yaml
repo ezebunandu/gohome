@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: cronjob-lister
+    namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: cronjob-lister
+rules:
+    - apiGroups:
+          - batch
+      resources:
+          - cronjobs
+      verbs:
+          - list
+          - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+    name: cronjob-lister
+roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cronjob-lister
+subjects:
+    - kind: ServiceAccount
+      name: cronjob-lister
+      namespace: default
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+    name: cronjob-lister
+    namespace: default
+spec:
+    schedule: "*/5 * * * *" # Run every 5 minutes
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+        spec:
+            template:
+                metadata:
+                    labels:
+                        app: cronjob-lister
+                spec:
+                    serviceAccountName: cronjob-lister
+                    restartPolicy: OnFailure
+                    containers:
+                        - name: cronjob-lister
+                          image: cronjob-lister:latest
+                          imagePullPolicy: IfNotPresent
+                          env:
+                              - name: NAMESPACE
+                                value: "default" # Change this to list cronjobs in a specific namespace
+                          resources:
+                              requests:
+                                  memory: "64Mi"
+                                  cpu: "100m"
+                              limits:
+                                  memory: "128Mi"
+                                  cpu: "200m"
+---
+
