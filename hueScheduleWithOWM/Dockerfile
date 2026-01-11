@@ -10,8 +10,8 @@ RUN go mod download
 # Copy source code
 COPY pkg/k8s/ ./pkg/k8s/
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cronjob-lister ./pkg/k8s/main.go
+# Build the binary for linux/amd64
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o cronjob-lister ./pkg/k8s/main.go
 
 # Runtime stage
 FROM alpine:latest
