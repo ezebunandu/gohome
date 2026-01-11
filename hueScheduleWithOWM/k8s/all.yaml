@@ -49,10 +49,12 @@ spec:
                         app: cronjob-lister
                 spec:
                     serviceAccountName: cronjob-lister
+                    imagePullSecrets:
+                        - name: home-k3s-registry
                     restartPolicy: OnFailure
                     containers:
                         - name: cronjob-lister
-                          image: cronjob-lister:latest
+                          image: registry.home-k3s.lab/cronjob-lister:v4
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: NAMESPACE
