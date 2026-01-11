@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
     name: cronjob-lister
-    namespace: default
+    namespace: gohome
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -30,13 +30,13 @@ roleRef:
 subjects:
     - kind: ServiceAccount
       name: cronjob-lister
-      namespace: default
+      namespace: gohome
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
     name: cronjob-lister
-    namespace: default
+    namespace: gohome
 spec:
     schedule: "*/5 * * * *" # Run every 5 minutes
     successfulJobsHistoryLimit: 3
