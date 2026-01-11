@@ -24,5 +24,5 @@ WORKDIR /app
 COPY --from=builder /build/cronjob-lister .
 
 # Run the binary
-CMD ["./cronjob-lister"]
+CMD ["/app/cronjob-lister"]
 
