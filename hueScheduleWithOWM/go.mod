@@ -3,6 +3,7 @@ module github.com/ezebunandu/hue-auto-schedule
 go 1.25.5
 
 require (
+	github.com/ezebunandu/controller v0.0.0-20260112051416-9584b548d782
 	github.com/google/go-cmp v0.7.0
 	k8s.io/api v0.35.0
 	k8s.io/apimachinery v0.35.0
@@ -12,6 +13,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
+	github.com/ezebunandu/gohue v0.0.0-20241219053637-5238c4a2e098 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect

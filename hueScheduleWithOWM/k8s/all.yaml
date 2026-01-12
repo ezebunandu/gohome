@@ -35,7 +35,7 @@ subjects:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-    name: cronjob-lister
+    name: scheduler
     namespace: gohome
 spec:
     schedule: "*/5 * * * *" # Run every 5 minutes
@@ -46,19 +46,26 @@ spec:
             template:
                 metadata:
                     labels:
-                        app: cronjob-lister
+                        app: scheduler
                 spec:
                     serviceAccountName: cronjob-lister
                     imagePullSecrets:
                         - name: home-k3s-registry
                     restartPolicy: OnFailure
                     containers:
-                        - name: cronjob-lister
-                          image: registry.home-k3s.lab/cronjob-lister:v4
+                        - name: scheduler
+                          image: registry.home-k3s.lab/gohome/scheduler:latest
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: NAMESPACE
                                 value: "gohome"
+                              - name: WEATHER_LOCATION
+                                value: "Calgary,CA"
+                              - name: OPENWEATHERMAP_API_KEY
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: openweathermap-api-key
+                                        key: api-key
                           resources:
                               requests:
                                   memory: "64Mi"
@@ -66,5 +73,93 @@ spec:
                               limits:
                                   memory: "128Mi"
                                   cpu: "200m"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+    name: sunrise
+    namespace: gohome
+spec:
+    schedule: "0 6 * * *" # Run daily at 6 AM (will be updated by scheduler)
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+        spec:
+            template:
+                metadata:
+                    labels:
+                        app: sunrise
+                spec:
+                    imagePullSecrets:
+                        - name: home-k3s-registry
+                    restartPolicy: OnFailure
+                    containers:
+                        - name: sunrise
+                          image: registry.home-k3s.lab/gohome/sunrise:latest
+                          imagePullPolicy: IfNotPresent
+                          env:
+                              - name: HUE_ID
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: hue-credentials
+                                        key: hue-id
+                              - name: HUE_IP_ADDRESS
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: hue-credentials
+                                        key: hue-ip-address
+                          args:
+                              - "Lamp Stand 2" # Light name
+                          resources:
+                              requests:
+                                  memory: "32Mi"
+                                  cpu: "50m"
+                              limits:
+                                  memory: "64Mi"
+                                  cpu: "100m"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+    name: sunset
+    namespace: gohome
+spec:
+    schedule: "0 18 * * *" # Run daily at 6 PM (will be updated by scheduler)
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    jobTemplate:
+        spec:
+            template:
+                metadata:
+                    labels:
+                        app: sunset
+                spec:
+                    imagePullSecrets:
+                        - name: home-k3s-registry
+                    restartPolicy: OnFailure
+                    containers:
+                        - name: sunset
+                          image: registry.home-k3s.lab/gohome/sunset:latest
+                          imagePullPolicy: IfNotPresent
+                          env:
+                              - name: HUE_ID
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: hue-credentials
+                                        key: hue-id
+                              - name: HUE_IP_ADDRESS
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: hue-credentials
+                                        key: hue-ip-address
+                          args:
+                              - "Lamp Stand 2" # Light name
+                          resources:
+                              requests:
+                                  memory: "32Mi"
+                                  cpu: "50m"
+                              limits:
+                                  memory: "64Mi"
+                                  cpu: "100m"
 ---
 
