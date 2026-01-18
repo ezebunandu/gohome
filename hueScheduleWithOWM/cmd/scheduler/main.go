@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ezebunandu/hue-auto-schedule/pkg/k8s"
-	weather "github.com/ezebunandu/hue-auto-schedule/pkg/owm"
+	"github.com/ezebunandu/hue-auto-schedule/pkg/scheduler"
+	"github.com/ezebunandu/hue-auto-schedule/pkg/weather"
 )
 
 const BaseURL = "https://api.openweathermap.org"
@@ -37,7 +37,7 @@ func main() {
 	fmt.Printf("Sunrise: %s (timestamp: %d)\n", sunriseCron, forecast.Sunrise)
 	fmt.Printf("Sunset: %s (timestamp: %d)\n", sunsetCron, forecast.Sunset)
 
-	scheduler, err := k8s.NewScheduler()
+	scheduler, err := scheduler.NewScheduler()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
