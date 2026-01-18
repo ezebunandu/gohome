@@ -64,15 +64,15 @@ spec:
                               - name: OPENWEATHERMAP_API_KEY
                                 valueFrom:
                                     secretKeyRef:
-                                        name: openweathermap-api-key
-                                        key: api-key
+                                        name: owm-api-key-secret
+                                        key: OWM_API_KEY
                           resources:
                               requests:
-                                  memory: "64Mi"
-                                  cpu: "100m"
+                                  memory: "4Mi"
+                                  cpu: "6m"
                               limits:
-                                  memory: "128Mi"
-                                  cpu: "200m"
+                                  memory: "8Mi"
+                                  cpu: "12m"
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -112,11 +112,11 @@ spec:
                               - "Front door" # Light name
                           resources:
                               requests:
-                                  memory: "32Mi"
-                                  cpu: "50m"
+                                  memory: "2Mi"
+                                  cpu: "3m"
                               limits:
-                                  memory: "64Mi"
-                                  cpu: "100m"
+                                  memory: "4Mi"
+                                  cpu: "6m"
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -156,10 +156,10 @@ spec:
                               - "Front door" # Light name
                           resources:
                               requests:
-                                  memory: "32Mi"
-                                  cpu: "50m"
+                                  memory: "2Mi"
+                                  cpu: "3m"
                               limits:
-                                  memory: "64Mi"
-                                  cpu: "100m"
+                                  memory: "4Mi"
+                                  cpu: "6m"
 ---
 
