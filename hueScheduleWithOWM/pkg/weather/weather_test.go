@@ -35,10 +35,6 @@ func TestParseResponse__ReturnsErrorGivenEmptyData(t *testing.T) {
 
 func TestUnixToCron(t *testing.T) {
 	t.Parallel()
-	mountainTime, err := time.LoadLocation("America/Denver")
-	if err != nil {
-		t.Fatalf("failed to load Mountain Time location: %v", err)
-	}
 
 	tests := []struct {
 		name      string
@@ -49,36 +45,24 @@ func TestUnixToCron(t *testing.T) {
 			name:      "converts int time to cron syntax",
 			timestamp: 1766878523, // from testdata
 			want: func() string {
-				t := time.Unix(1766878523, 0).In(mountainTime)
+				t := time.Unix(1766878523, 0).UTC()
 				return fmt.Sprintf("%d %d * * *", t.Minute(), t.Hour())
 			}(),
 		},
 		{
 			name:      "handles midnight correctly",
 			timestamp: int(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix()),
-			want: func() string {
-				// Midnight UTC in Mountain Time (UTC-7 in January, so 5pm previous day)
-				t := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).In(mountainTime)
-				return fmt.Sprintf("%d %d * * *", t.Minute(), t.Hour())
-			}(),
+			want:      "0 0 * * *",
 		},
 		{
 			name:      "handles noon correctly",
 			timestamp: int(time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC).Unix()),
-			want: func() string {
-				// Noon UTC in Mountain Time (UTC-7 in January, so 5am)
-				t := time.Date(2024, 1, 1, 12, 0, 0, 0, time.UTC).In(mountainTime)
-				return fmt.Sprintf("%d %d * * *", t.Minute(), t.Hour())
-			}(),
+			want:      "0 12 * * *",
 		},
 		{
 			name:      "handles arbitrary time correctly",
 			timestamp: int(time.Date(2024, 6, 15, 14, 35, 0, 0, time.UTC).Unix()),
-			want: func() string {
-				// 14:35 UTC in Mountain Time (UTC-6 in June, so 8:35am)
-				t := time.Date(2024, 6, 15, 14, 35, 0, 0, time.UTC).In(mountainTime)
-				return fmt.Sprintf("%d %d * * *", t.Minute(), t.Hour())
-			}(),
+			want:      "35 14 * * *",
 		},
 	}
 
