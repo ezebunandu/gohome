@@ -32,16 +32,10 @@ func ParseResponse(data []byte) (Forecast, error) {
 }
 
 // UnixToCron converts a Unix timestamp to cron syntax format (minute hour * * *)
-// The timestamp is converted to Mountain Time for the cron schedule
+// The timestamp is in UTC, and Kubernetes CronJobs interpret cron schedules in UTC,
+// so we can use the UTC time directly
 func UnixToCron(timestamp int) string {
-	t := time.Unix(int64(timestamp), 0)
-	// Load Mountain Time location (handles both MST and MDT automatically)
-	// LoadLocation rarely fails for well-known timezones like "America/Denver"
-	mountainTime, _ := time.LoadLocation("America/Denver")
-	if mountainTime == nil {
-		mountainTime = time.UTC
-	}
-	t = t.In(mountainTime)
+	t := time.Unix(int64(timestamp), 0).UTC()
 	minute := t.Minute()
 	hour := t.Hour()
 	return fmt.Sprintf("%d %d * * *", minute, hour)

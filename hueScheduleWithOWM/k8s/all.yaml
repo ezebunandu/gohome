@@ -38,7 +38,7 @@ metadata:
     name: scheduler
     namespace: gohome
 spec:
-    schedule: "*/5 * * * *" # Run every 5 minutes
+    schedule: "0 1 * * *" # Run daily at 1 AM
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 3
     jobTemplate:
@@ -54,7 +54,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: scheduler
-                          image: registry.home-k3s.lab/gohome/scheduler:latest
+                          image: registry.home-k3s.lab/gohome/scheduler:v4
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: NAMESPACE
@@ -95,7 +95,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: sunrise
-                          image: registry.home-k3s.lab/gohome/sunrise:latest
+                          image: registry.home-k3s.lab/gohome/sunrise:v4
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: HUE_ID
@@ -139,7 +139,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: sunset
-                          image: registry.home-k3s.lab/gohome/sunset:latest
+                          image: registry.home-k3s.lab/gohome/sunset:v4
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: HUE_ID
