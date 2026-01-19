@@ -97,6 +97,8 @@ spec:
                         - name: sunrise
                           image: registry.home-k3s.lab/gohome/sunrise:v4
                           imagePullPolicy: IfNotPresent
+                          command: ["/app/sunrise"]
+                          args: ["Front door"] # Light name
                           env:
                               - name: HUE_ID
                                 valueFrom:
@@ -108,8 +110,6 @@ spec:
                                     secretKeyRef:
                                         name: hue-credentials
                                         key: hue-ip-address
-                          args:
-                              - "Front door" # Light name
                           resources:
                               requests:
                                   memory: "2Mi"
@@ -141,6 +141,8 @@ spec:
                         - name: sunset
                           image: registry.home-k3s.lab/gohome/sunset:v4
                           imagePullPolicy: IfNotPresent
+                          command: ["/app/sunset"]
+                          args: ["Front door"] # Light name
                           env:
                               - name: HUE_ID
                                 valueFrom:
@@ -152,8 +154,6 @@ spec:
                                     secretKeyRef:
                                         name: hue-credentials
                                         key: hue-ip-address
-                          args:
-                              - "Front door" # Light name
                           resources:
                               requests:
                                   memory: "2Mi"
