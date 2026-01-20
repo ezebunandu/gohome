@@ -7,3 +7,6 @@ The `scheduler` cronjob runs on a fixed time daily. It makes requests to the ope
 The `sunrise` and `sunset` cronjobs are simple. They communicate with the Phillips Hue Bridge to request the light be turned on or off, at sunset or sunrise.
 
 ![The architecture diagram](./assets/architecture.png)
+
+![The scheduler doing its thing](./assets/scheduler-run.png)
+![sunrise and sunset schedules updated](./assets/updated-schedules.png)
