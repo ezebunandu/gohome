@@ -54,7 +54,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: scheduler
-                          image: registry.home-k3s.lab/gohome/scheduler:v4
+                          image: registry.home-k3s.lab/gohome/scheduler:v5
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: NAMESPACE
@@ -95,7 +95,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: sunrise
-                          image: registry.home-k3s.lab/gohome/sunrise:v4
+                          image: registry.home-k3s.lab/gohome/sunrise:v5
                           imagePullPolicy: IfNotPresent
                           command: ["/app/sunrise"]
                           args: ["Front door", "Garage Outside"] # Light name
@@ -139,7 +139,7 @@ spec:
                     restartPolicy: OnFailure
                     containers:
                         - name: sunset
-                          image: registry.home-k3s.lab/gohome/sunset:v4
+                          image: registry.home-k3s.lab/gohome/sunset:v5
                           imagePullPolicy: IfNotPresent
                           command: ["/app/sunset"]
                           args: ["Front door", "Garage Outside"] # Light name
