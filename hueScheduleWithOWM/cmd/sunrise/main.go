@@ -14,13 +14,15 @@ func main() {
         fmt.Println(Usage)
         os.Exit(0)
     }
-    light := os.Args[1]
+    lights := os.Args[1:]
 	ctl, err := controller.NewController(HueID, HueIPAddress)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	err = ctl.EnsureOff(light)
+	for _, light := range lights {
+		err = ctl.EnsureOff(light)
+	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

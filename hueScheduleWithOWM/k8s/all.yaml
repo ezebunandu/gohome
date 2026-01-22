@@ -98,7 +98,7 @@ spec:
                           image: registry.home-k3s.lab/gohome/sunrise:v4
                           imagePullPolicy: IfNotPresent
                           command: ["/app/sunrise"]
-                          args: ["Front door"] # Light name
+                          args: ["Front door", "Garage Outside"] # Light name
                           env:
                               - name: HUE_ID
                                 valueFrom:
@@ -142,7 +142,7 @@ spec:
                           image: registry.home-k3s.lab/gohome/sunset:v4
                           imagePullPolicy: IfNotPresent
                           command: ["/app/sunset"]
-                          args: ["Front door"] # Light name
+                          args: ["Front door", "Garage Outside"] # Light name
                           env:
                               - name: HUE_ID
                                 valueFrom:
