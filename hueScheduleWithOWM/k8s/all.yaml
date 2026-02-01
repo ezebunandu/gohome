@@ -13,6 +13,9 @@ rules:
           - batch
       resources:
           - cronjobs
+      resourceNames: 
+          - sunrise
+          - sunset
       verbs:
           - list
           - get
