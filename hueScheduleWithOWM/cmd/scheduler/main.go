@@ -15,7 +15,7 @@ import (
 const BaseURL = "https://api.openweathermap.org"
 
 func main() {
-	ns := getenv("NAMESPACE", "default")
+	ns := getenv("NAMESPACE", "gohome")
 	location := getenv("WEATHER_LOCATION", "Calgary,CA")
 	apiKey := os.Getenv("OPENWEATHERMAP_API_KEY")
 	if apiKey == "" {
@@ -31,13 +31,13 @@ func main() {
 	}
 
 	// Convert sunrise and sunset to cron syntax
-	sunriseCron := weather.UnixToCron(forecast.Sunrise)
-	sunsetCron := weather.UnixToCron(forecast.Sunset)
+	sunriseTimeCron := weather.UnixToCron(forecast.Sunrise)
+	sunsetTimeCron := weather.UnixToCron(forecast.Sunset)
 
-	fmt.Printf("Sunrise: %s (timestamp: %d)\n", sunriseCron, forecast.Sunrise)
-	fmt.Printf("Sunset: %s (timestamp: %d)\n", sunsetCron, forecast.Sunset)
+	fmt.Printf("Sunrise: %s (timestamp: %d)\n", sunriseTimeCron, forecast.Sunrise)
+	fmt.Printf("Sunset: %s (timestamp: %d)\n", sunsetTimeCron, forecast.Sunset)
 
-	scheduler, err := scheduler.NewScheduler()
+	sched, err := scheduler.NewScheduler(ns)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
@@ -47,16 +47,16 @@ func main() {
 	defer cancel()
 
 	// Update sunrise CronJob schedule
-	fmt.Printf("Updating sunrise CronJob schedule to %s\n", sunriseCron)
-	if err := scheduler.ModifyCronJobExecution(ctx, ns, "sunrise", sunriseCron); err != nil {
+	fmt.Printf("Updating sunrise CronJob schedule to %s\n", sunriseTimeCron)
+	if err := sched.ModifyCronJobExecution(ctx, "sunrise", sunriseTimeCron); err != nil {
 		fmt.Fprintf(os.Stderr, "error: failed to update sunrise CronJob: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Printf("Successfully updated sunrise CronJob schedule\n")
 
 	// Update sunset CronJob schedule
-	fmt.Printf("Updating sunset CronJob schedule to %s\n", sunsetCron)
-	if err := scheduler.ModifyCronJobExecution(ctx, ns, "sunset", sunsetCron); err != nil {
+	fmt.Printf("Updating sunset CronJob schedule to %s\n", sunsetTimeCron)
+	if err := sched.ModifyCronJobExecution(ctx, "sunset", sunsetTimeCron); err != nil {
 		fmt.Fprintf(os.Stderr, "error: failed to update sunset CronJob: %v\n", err)
 		os.Exit(1)
 	}

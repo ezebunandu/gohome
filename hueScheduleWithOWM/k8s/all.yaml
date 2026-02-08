@@ -61,7 +61,9 @@ spec:
                           imagePullPolicy: IfNotPresent
                           env:
                               - name: NAMESPACE
-                                value: "gohome"
+                                valueFrom:
+                                    fieldRef:
+                                        fieldPath: metadata.namespace
                               - name: WEATHER_LOCATION
                                 value: "Calgary,CA"
                               - name: OPENWEATHERMAP_API_KEY
