@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -110,7 +109,11 @@ func getTemperature() *temp {
 	}
 }
 
-func HTTPHandler(respWriter io.Writer, resp *httpx.ResponseHeader) {
+func HTTPHandler(conn io.ReadWriter, resp *httpx.ResponseHeader) {
+	// Drain incoming request to keep the TCP RX buffer clear.
+	var discard [tcpbufsize]byte
+	conn.Read(discard[:])
+
 	resp.SetConnectionClose()
 	logger.Info("Got temperature request...")
 	t := getTemperature()
@@ -126,15 +129,12 @@ func HTTPHandler(respWriter io.Writer, resp *httpx.ResponseHeader) {
 		resp.SetContentType("application/json")
 		resp.SetContentLength(len(body))
 	}
-	respWriter.Write(resp.Header())
-	respWriter.Write(body)
+	conn.Write(resp.Header())
+	conn.Write(body)
 }
 
 func handleConnection(listener *stacks.TCPListener, blink chan uint) {
-	// Reuse the same buffers for each
-	// connection to avoid heap allocations
 	var resp httpx.ResponseHeader
-	buf := bufio.NewReaderSize(nil, 1024)
 
 	for {
 		conn, err := listener.Accept()
@@ -159,7 +159,6 @@ func handleConnection(listener *stacks.TCPListener, blink chan uint) {
 			)
 			continue
 		}
-		buf.Reset(conn)
 		resp.Reset()
 		HTTPHandler(conn, &resp)
 		conn.Close()
