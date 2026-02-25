@@ -163,7 +163,11 @@ func handleConnection(listener *stacks.TCPListener, blink chan uint) {
 		HTTPHandler(conn, &resp)
 		conn.Close()
 
-		blink <- 5
+		select {
+		case blink <- 5:
+		default:
+			// channel full; skip LED feedback rather than blocking Accept
+		}
 	}
 }
 
@@ -177,8 +181,15 @@ func main() {
 
 	for {
 		select {
-		case <-time.After(1 * time.Minute):
-			logger.Info("Waiting for connections...")
+		case <-time.After(30 * time.Second):
+			if dev.NetFlags() == 0 {
+				logger.Info("WiFi link lost, attempting reconnect...")
+				if _, err := common.Reconnect(dev, stack, hostname, logger); err != nil {
+					logger.Error("reconnect failed", slog.String("err", err.Error()))
+				}
+			} else {
+				logger.Info("heartbeat: waiting for connections")
+			}
 		}
 	}
 }
