@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picotempexport
+  namespace: gohome
+  labels:
+    app: picotempexport
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: picotempexport
+  template:
+    metadata:
+      labels:
+        app: picotempexport
+    spec:
+      containers:
+        - name: picotempexport
+          image: registry.home-k3s.lab/gohome/picotempexport:v1
+          ports:
+            - containerPort: 3030
+              name: temp-export
+          env:
+            - name: PICO_SERVER_URL
+              value: "http://192.168.57.213"
+      imagePullSecrets:
+      - name: home-k3s-registry

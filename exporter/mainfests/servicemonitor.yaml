@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: picotempexport
+  namespace: gohome
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: picotempexport
+  endpoints:
+    - port: temp-export
+      path: /metrics
+      interval: 1m
